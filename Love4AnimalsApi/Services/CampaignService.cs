@@ -6,30 +6,30 @@ namespace Love4AnimalsApi.Services;
 
 public class CampaignService : ICampaignService
 {
-    private ICampaignRepository campaignRepository;
+    private readonly ICampaignRepository campaignRepository;
 
     public CampaignService(ICampaignRepository campaignRepository)
     {
         this.campaignRepository = campaignRepository;
     }
 
-    public List<GetCampaignDto> GetCampaigns()
+    public async Task<List<GetCampaignDto>> GetCampaignsAsync()
     {
-        return campaignRepository.GetCampaigns()
-            .Select(c => new GetCampaignDto(
-                c.Id,
-                c.Titulo,
-                c.MetaRecaudacion,
-                c.MontoActual,
-                c.Estado,
-                c.Descripcion
-            ))
-            .ToList();
+        var campaigns = await campaignRepository.GetCampaignsAsync();
+
+        return campaigns.Select(c => new GetCampaignDto(
+            c.Id,
+            c.Titulo,
+            c.MetaRecaudacion,
+            c.MontoActual,
+            c.Estado,
+            c.Descripcion
+        )).ToList();
     }
 
-    public GetCampaignDto? GetCampaignById(int id)
+    public async Task<GetCampaignDto?> GetCampaignByIdAsync(int id)
     {
-        var campaign = campaignRepository.GetCampaignById(id);
+        var campaign = await campaignRepository.GetCampaignByIdAsync(id);
 
         if (campaign == null)
             return null;
@@ -44,13 +44,10 @@ public class CampaignService : ICampaignService
         );
     }
 
-    public GetCampaignDto CreateCampaign(CreateCampaignDto dto)
+    public async Task<GetCampaignDto> CreateCampaignAsync(CreateCampaignDto dto)
     {
-        var campaigns = campaignRepository.GetCampaigns();
-        int newId = campaigns.Count > 0 ? campaigns.Max(c => c.Id) + 1 : 1;
-
         Campaign newCampaign = new Campaign(
-            newId,
+            0,
             dto.Titulo,
             dto.MetaRecaudacion,
             dto.MontoActual,
@@ -58,7 +55,7 @@ public class CampaignService : ICampaignService
             dto.Descripcion
         );
 
-        var createdCampaign = campaignRepository.CreateCampaign(newCampaign);
+        var createdCampaign = await campaignRepository.CreateCampaignAsync(newCampaign);
 
         return new GetCampaignDto(
             createdCampaign.Id,
@@ -70,9 +67,9 @@ public class CampaignService : ICampaignService
         );
     }
 
-    public GetCampaignDto? UpdateCampaign(int id, UpdateCampaignDto dto)
+    public async Task<GetCampaignDto?> UpdateCampaignAsync(int id, UpdateCampaignDto dto)
     {
-        var campaign = campaignRepository.GetCampaignById(id);
+        var campaign = await campaignRepository.GetCampaignByIdAsync(id);
 
         if (campaign == null)
             return null;
@@ -82,6 +79,8 @@ public class CampaignService : ICampaignService
         campaign.MontoActual = dto.MontoActual;
         campaign.Estado = dto.Estado;
         campaign.Descripcion = dto.Descripcion;
+
+        await campaignRepository.UpdateCampaignAsync(campaign);
 
         return new GetCampaignDto(
             campaign.Id,
@@ -93,9 +92,9 @@ public class CampaignService : ICampaignService
         );
     }
 
-    public GetCampaignDto? DeleteCampaign(int id)
+    public async Task<GetCampaignDto?> DeleteCampaignAsync(int id)
     {
-        var campaign = campaignRepository.GetCampaignById(id);
+        var campaign = await campaignRepository.GetCampaignByIdAsync(id);
 
         if (campaign == null)
             return null;
@@ -109,7 +108,7 @@ public class CampaignService : ICampaignService
             campaign.Descripcion
         );
 
-        campaignRepository.DeleteCampaign(id);
+        await campaignRepository.DeleteCampaignAsync(campaign);
 
         return deletedCampaign;
     }

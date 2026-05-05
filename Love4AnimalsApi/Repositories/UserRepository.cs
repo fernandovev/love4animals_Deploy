@@ -1,59 +1,48 @@
+using Love4AnimalsApi.Data;
 using Love4AnimalsApi.Interfaces;
 using Love4AnimalsApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Love4AnimalsApi.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private List<User> Users { get; set; }
+    private readonly AppDbContext context;
 
-    public UserRepository()
+    public UserRepository(AppDbContext context)
     {
-        Users = new List<User>();
-
-        Users.Add(new User(1, "Ana", "ana@gmail.com", "1234", RolEnum.MISIONERO));
-        Users.Add(new User(2, "Luis", "luis@gmail.com", "abcd", RolEnum.DONANTE));
+        this.context = context;
     }
 
-    public List<User> GetUsers()
+    public async Task<List<User>> GetUsersAsync()
     {
-        return Users;
+        return await context.Users
+            .AsNoTracking()
+            .ToListAsync();
     }
 
-    public User? GetUserById(int id)
+    public async Task<User?> GetUserByIdAsync(int id)
     {
-        return Users.FirstOrDefault(u => u.Id == id);
+        return await context.Users
+            .FirstOrDefaultAsync(u => u.Id == id);
     }
 
-    public User CreateUser(User user)
+    public async Task<User> CreateUserAsync(User user)
     {
-        Users.Add(user);
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
         return user;
     }
 
-    public bool UpdateUser(int id, User user)
+    public async Task UpdateUserAsync(User user)
     {
-        var existingUser = Users.FirstOrDefault(u => u.Id == id);
-
-        if (existingUser == null)
-            return false;
-
-        existingUser.Nombre = user.Nombre;
-        existingUser.Email = user.Email;
-        existingUser.Password = user.Password;
-        existingUser.Rol = user.Rol;
-
-        return true;
+        context.Users.Update(user);
+        await context.SaveChangesAsync();
     }
 
-    public bool DeleteUser(int id)
+    public async Task DeleteUserAsync(User user)
     {
-        var user = Users.FirstOrDefault(u => u.Id == id);
-
-        if (user == null)
-            return false;
-
-        Users.Remove(user);
-        return true;
+        context.Users.Remove(user);
+        await context.SaveChangesAsync();
     }
 }

@@ -48,7 +48,7 @@ public class DonationService : IDonationService
         Donation newDonation = new Donation(
             newId,
             dto.Monto,
-            DateTime.Now,
+            DateTime.UtcNow,
             dto.Estado
         );
 
@@ -70,7 +70,7 @@ public class DonationService : IDonationService
             return null;
 
         donation.Monto = dto.Monto;
-        donation.Fecha = DateTime.Now;
+        donation.Fecha = DateTime.UtcNow;
         donation.Estado = dto.Estado;
 
         return new GetDonationDto(

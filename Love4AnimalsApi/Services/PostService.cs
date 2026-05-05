@@ -64,7 +64,7 @@ public class PostService : IPostService
             dto.Estado,
             dto.Imagen,
             dto.Descripcion,
-            DateTime.Now,
+            DateTime.UtcNow,
             0,
             0,
             0

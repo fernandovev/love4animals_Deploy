@@ -4,9 +4,9 @@ namespace Love4AnimalsApi.Interfaces;
 
 public interface IUserService
 {
-    List<GetUserDto> GetUsers();
-    GetUserDto? GetUserById(int id);
-    GetUserDto CreateUser(CreateUserDto dto);
-    GetUserDto? UpdateUser(int id, UpdateUserDto dto);
-    GetUserDto? DeleteUser(int id);
+    Task<List<GetUserDto>> GetUsersAsync();
+    Task<GetUserDto?> GetUserByIdAsync(int id);
+    Task<GetUserDto> CreateUserAsync(CreateUserDto dto);
+    Task<GetUserDto?> UpdateUserAsync(int id, UpdateUserDto dto);
+    Task<GetUserDto?> DeleteUserAsync(int id);
 }

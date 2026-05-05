@@ -15,11 +15,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+// EF Core
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<ICampaignService, CampaignService>();
-builder.Services.AddSingleton<ICampaignRepository, CampaignRepository>();
+builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
 
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
@@ -27,6 +28,7 @@ builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
+// Donaciones todavía en memoria
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddSingleton<IDonationRepository, DonationRepository>();
 

@@ -1,75 +1,48 @@
+using Love4AnimalsApi.Data;
 using Love4AnimalsApi.Interfaces;
 using Love4AnimalsApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Love4AnimalsApi.Repositories;
 
 public class CampaignRepository : ICampaignRepository
 {
-    private List<Campaign> Campaigns { get; set; }
+    private readonly AppDbContext context;
 
-    public CampaignRepository()
+    public CampaignRepository(AppDbContext context)
     {
-        Campaigns = new List<Campaign>();
-
-        Campaigns.Add(new Campaign(
-            1,
-            "Rescate animal",
-            5000,
-            1000,
-            EstadoCampaniaEnum.ACTIVA,
-            "Campaña para rescatar animales"
-        ));
-
-        Campaigns.Add(new Campaign(
-            2,
-            "Alimento refugio",
-            3000,
-            500,
-            EstadoCampaniaEnum.ACTIVA,
-            "Recaudación para alimento"
-        ));
+        this.context = context;
     }
 
-    public List<Campaign> GetCampaigns()
+    public async Task<List<Campaign>> GetCampaignsAsync()
     {
-        return Campaigns;
+        return await context.Campaigns
+            .AsNoTracking()
+            .ToListAsync();
     }
 
-    public Campaign? GetCampaignById(int id)
+    public async Task<Campaign?> GetCampaignByIdAsync(int id)
     {
-        return Campaigns.FirstOrDefault(c => c.Id == id);
+        return await context.Campaigns
+            .FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    public Campaign CreateCampaign(Campaign campaign)
+    public async Task<Campaign> CreateCampaignAsync(Campaign campaign)
     {
-        Campaigns.Add(campaign);
+        context.Campaigns.Add(campaign);
+        await context.SaveChangesAsync();
         return campaign;
     }
 
-    public bool UpdateCampaign(int id, Campaign campaign)
+    public async Task UpdateCampaignAsync(Campaign campaign)
     {
-        var existing = Campaigns.FirstOrDefault(c => c.Id == id);
-
-        if (existing == null)
-            return false;
-
-        existing.Titulo = campaign.Titulo;
-        existing.MetaRecaudacion = campaign.MetaRecaudacion;
-        existing.MontoActual = campaign.MontoActual;
-        existing.Estado = campaign.Estado;
-        existing.Descripcion = campaign.Descripcion;
-
-        return true;
+        context.Campaigns.Update(campaign);
+        await context.SaveChangesAsync();
     }
 
-    public bool DeleteCampaign(int id)
+    public async Task DeleteCampaignAsync(Campaign campaign)
     {
-        var campaign = Campaigns.FirstOrDefault(c => c.Id == id);
-
-        if (campaign == null)
-            return false;
-
-        Campaigns.Remove(campaign);
-        return true;
+        context.Campaigns.Remove(campaign);
+        await context.SaveChangesAsync();
     }
 }

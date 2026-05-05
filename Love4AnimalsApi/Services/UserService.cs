@@ -6,29 +6,29 @@ namespace Love4AnimalsApi.Services;
 
 public class UserService : IUserService
 {
-    private IUserRepository userRepository;
+    private readonly IUserRepository userRepository;
 
     public UserService(IUserRepository userRepository)
     {
         this.userRepository = userRepository;
     }
 
-    public List<GetUserDto> GetUsers()
+    public async Task<List<GetUserDto>> GetUsersAsync()
     {
-        return userRepository.GetUsers()
-            .Select(user => new GetUserDto(
-                user.Id,
-                user.Nombre,
-                user.Email,
-                user.Password,
-                user.Rol
-            ))
-            .ToList();
+        var users = await userRepository.GetUsersAsync();
+
+        return users.Select(user => new GetUserDto(
+            user.Id,
+            user.Nombre,
+            user.Email,
+            user.Password,
+            user.Rol
+        )).ToList();
     }
 
-    public GetUserDto? GetUserById(int id)
+    public async Task<GetUserDto?> GetUserByIdAsync(int id)
     {
-        var user = userRepository.GetUserById(id);
+        var user = await userRepository.GetUserByIdAsync(id);
 
         if (user == null)
             return null;
@@ -42,20 +42,17 @@ public class UserService : IUserService
         );
     }
 
-    public GetUserDto CreateUser(CreateUserDto dto)
+    public async Task<GetUserDto> CreateUserAsync(CreateUserDto dto)
     {
-        var users = userRepository.GetUsers();
-        int newId = users.Count > 0 ? users.Max(u => u.Id) + 1 : 1;
-
         User newUser = new User(
-            newId,
+            0,
             dto.Nombre,
             dto.Email,
             dto.Password,
             dto.Rol
         );
 
-        var createdUser = userRepository.CreateUser(newUser);
+        var createdUser = await userRepository.CreateUserAsync(newUser);
 
         return new GetUserDto(
             createdUser.Id,
@@ -66,9 +63,9 @@ public class UserService : IUserService
         );
     }
 
-    public GetUserDto? UpdateUser(int id, UpdateUserDto dto)
+    public async Task<GetUserDto?> UpdateUserAsync(int id, UpdateUserDto dto)
     {
-        var user = userRepository.GetUserById(id);
+        var user = await userRepository.GetUserByIdAsync(id);
 
         if (user == null)
             return null;
@@ -77,6 +74,8 @@ public class UserService : IUserService
         user.Email = dto.Email;
         user.Password = dto.Password;
         user.Rol = dto.Rol;
+
+        await userRepository.UpdateUserAsync(user);
 
         return new GetUserDto(
             user.Id,
@@ -87,9 +86,9 @@ public class UserService : IUserService
         );
     }
 
-    public GetUserDto? DeleteUser(int id)
+    public async Task<GetUserDto?> DeleteUserAsync(int id)
     {
-        var user = userRepository.GetUserById(id);
+        var user = await userRepository.GetUserByIdAsync(id);
 
         if (user == null)
             return null;
@@ -102,7 +101,7 @@ public class UserService : IUserService
             user.Rol
         );
 
-        userRepository.DeleteUser(id);
+        await userRepository.DeleteUserAsync(user);
 
         return deletedUser;
     }

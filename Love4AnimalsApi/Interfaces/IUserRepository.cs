@@ -4,9 +4,9 @@ namespace Love4AnimalsApi.Interfaces;
 
 public interface IUserRepository
 {
-    List<User> GetUsers();
-    User? GetUserById(int id);
-    User CreateUser(User user);
-    bool UpdateUser(int id, User user);
-    bool DeleteUser(int id);
+    Task<List<User>> GetUsersAsync();
+    Task<User?> GetUserByIdAsync(int id);
+    Task<User> CreateUserAsync(User user);
+    Task UpdateUserAsync(User user);
+    Task DeleteUserAsync(User user);
 }

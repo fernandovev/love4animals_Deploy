@@ -53,7 +53,7 @@ public class CommentService : ICommentService
             0,
             postId,
             dto.Texto,
-            DateTime.Now
+            DateTime.UtcNow
         );
 
         var createdComment = await commentRepository.CreateCommentAsync(newComment);
@@ -74,7 +74,7 @@ public class CommentService : ICommentService
             return null;
 
         comment.Texto = dto.Texto;
-        comment.Fecha = DateTime.Now;
+        comment.Fecha = DateTime.UtcNow;
 
         await commentRepository.UpdateCommentAsync(comment);
 
