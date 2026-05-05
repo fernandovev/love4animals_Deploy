@@ -1,7 +1,11 @@
+using Love4AnimalsApi.Models;
+
 namespace Love4AnimalsApi.Dtos;
 
-public record GetUserDto (
+public record GetUserDto(
     int Id,
-    string Name,
-    string Email
+    string Nombre,
+    string Email,
+    string Password,
+    RolEnum Rol
 );

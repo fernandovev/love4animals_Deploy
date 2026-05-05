@@ -1,17 +1,26 @@
-using System;
-
 namespace Love4AnimalsApi.Models;
+
+public enum RolEnum
+{
+    ADMIN,
+    MISIONERO,
+    DONANTE
+}
 
 public class User
 {
-    public User (int Id, string Name, string Email)
+    public User(int id, string nombre, string email, string password, RolEnum rol)
     {
-        this.Id = Id;
-        this.Name = Name;
-        this.Email = Email;
+        Id = id;
+        Nombre = nombre;
+        Email = email;
+        Password = password;
+        Rol = rol;
     }
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
 
+    public int Id { get; set; }
+    public string Nombre { get; set; }
+    public string Email { get; set; }
+    public string Password { get; set; }
+    public RolEnum Rol { get; set; }
 }

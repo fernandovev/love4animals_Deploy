@@ -1,7 +1,5 @@
-using System;
 using Love4AnimalsApi.Interfaces;
 using Love4AnimalsApi.Models;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Love4AnimalsApi.Repositories;
 
@@ -11,12 +9,51 @@ public class UserRepository : IUserRepository
 
     public UserRepository()
     {
-        this.Users = [];
-        User newUser = new(1, "Name", "test@gmail.com");
-        this.Users.Add(newUser);
+        Users = new List<User>();
+
+        Users.Add(new User(1, "Ana", "ana@gmail.com", "1234", RolEnum.MISIONERO));
+        Users.Add(new User(2, "Luis", "luis@gmail.com", "abcd", RolEnum.DONANTE));
     }
-    public User getUser()
+
+    public List<User> GetUsers()
     {
-        return this.Users.First();
+        return Users;
+    }
+
+    public User? GetUserById(int id)
+    {
+        return Users.FirstOrDefault(u => u.Id == id);
+    }
+
+    public User CreateUser(User user)
+    {
+        Users.Add(user);
+        return user;
+    }
+
+    public bool UpdateUser(int id, User user)
+    {
+        var existingUser = Users.FirstOrDefault(u => u.Id == id);
+
+        if (existingUser == null)
+            return false;
+
+        existingUser.Nombre = user.Nombre;
+        existingUser.Email = user.Email;
+        existingUser.Password = user.Password;
+        existingUser.Rol = user.Rol;
+
+        return true;
+    }
+
+    public bool DeleteUser(int id)
+    {
+        var user = Users.FirstOrDefault(u => u.Id == id);
+
+        if (user == null)
+            return false;
+
+        Users.Remove(user);
+        return true;
     }
 }
