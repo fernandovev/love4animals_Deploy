@@ -28,9 +28,8 @@ builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
-// Donaciones todavía en memoria
 builder.Services.AddScoped<IDonationService, DonationService>();
-builder.Services.AddSingleton<IDonationRepository, DonationRepository>();
+builder.Services.AddScoped<IDonationRepository, DonationRepository>();
 
 var app = builder.Build();
 

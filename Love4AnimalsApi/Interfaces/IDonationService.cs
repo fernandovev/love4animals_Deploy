@@ -4,9 +4,9 @@ namespace Love4AnimalsApi.Interfaces;
 
 public interface IDonationService
 {
-    List<GetDonationDto> GetDonations();
-    GetDonationDto? GetDonationById(int id);
-    GetDonationDto CreateDonation(CreateDonationDto dto);
-    GetDonationDto? UpdateDonation(int id, UpdateDonationDto dto);
-    GetDonationDto? DeleteDonation(int id);
+    Task<List<GetDonationDto>> GetDonationsAsync();
+    Task<GetDonationDto?> GetDonationByIdAsync(int id);
+    Task<GetDonationDto?> CreateDonationAsync(CreateDonationDto dto);
+    Task<GetDonationDto?> UpdateDonationAsync(int id, UpdateDonationDto dto);
+    Task<GetDonationDto?> DeleteDonationAsync(int id);
 }

@@ -7,10 +7,17 @@ namespace Love4AnimalsApi.Services;
 public class PostService : IPostService
 {
     private readonly IPostRepository postRepository;
+    private readonly IUserRepository userRepository;
+    private readonly ICampaignRepository campaignRepository;
 
-    public PostService(IPostRepository postRepository)
+    public PostService(
+        IPostRepository postRepository,
+        IUserRepository userRepository,
+        ICampaignRepository campaignRepository)
     {
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
+        this.campaignRepository = campaignRepository;
     }
 
     public async Task<List<GetPostDto>> GetPostsAsync()
@@ -19,6 +26,8 @@ public class PostService : IPostService
 
         return posts.Select(p => new GetPostDto(
             p.Id,
+            p.UserId,
+            p.CampaignId,
             p.Titulo,
             p.MetaRecaudacion,
             p.MontoActual,
@@ -41,6 +50,8 @@ public class PostService : IPostService
 
         return new GetPostDto(
             post.Id,
+            post.UserId,
+            post.CampaignId,
             post.Titulo,
             post.MetaRecaudacion,
             post.MontoActual,
@@ -54,10 +65,20 @@ public class PostService : IPostService
         );
     }
 
-    public async Task<GetPostDto> CreatePostAsync(CreatePostDto dto)
+    public async Task<GetPostDto?> CreatePostAsync(CreatePostDto dto)
     {
+        var user = await userRepository.GetUserByIdAsync(dto.UserId);
+        if (user == null)
+            return null;
+
+        var campaign = await campaignRepository.GetCampaignByIdAsync(dto.CampaignId);
+        if (campaign == null)
+            return null;
+
         Post newPost = new Post(
             0,
+            dto.UserId,
+            dto.CampaignId,
             dto.Titulo,
             dto.MetaRecaudacion,
             dto.MontoActual,
@@ -74,6 +95,8 @@ public class PostService : IPostService
 
         return new GetPostDto(
             createdPost.Id,
+            createdPost.UserId,
+            createdPost.CampaignId,
             createdPost.Titulo,
             createdPost.MetaRecaudacion,
             createdPost.MontoActual,
@@ -94,6 +117,16 @@ public class PostService : IPostService
         if (post == null)
             return null;
 
+        var user = await userRepository.GetUserByIdAsync(dto.UserId);
+        if (user == null)
+            return null;
+
+        var campaign = await campaignRepository.GetCampaignByIdAsync(dto.CampaignId);
+        if (campaign == null)
+            return null;
+
+        post.UserId = dto.UserId;
+        post.CampaignId = dto.CampaignId;
         post.Titulo = dto.Titulo;
         post.MetaRecaudacion = dto.MetaRecaudacion;
         post.MontoActual = dto.MontoActual;
@@ -105,6 +138,8 @@ public class PostService : IPostService
 
         return new GetPostDto(
             post.Id,
+            post.UserId,
+            post.CampaignId,
             post.Titulo,
             post.MetaRecaudacion,
             post.MontoActual,
@@ -127,6 +162,8 @@ public class PostService : IPostService
 
         var deletedPost = new GetPostDto(
             post.Id,
+            post.UserId,
+            post.CampaignId,
             post.Titulo,
             post.MetaRecaudacion,
             post.MontoActual,

@@ -4,6 +4,8 @@ namespace Love4AnimalsApi.Dtos;
 
 public record GetPostDto(
     int Id,
+    int UserId,
+    int CampaignId,
     string Titulo,
     double MetaRecaudacion,
     double MontoActual,

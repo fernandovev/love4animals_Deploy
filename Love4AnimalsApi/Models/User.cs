@@ -2,9 +2,8 @@ namespace Love4AnimalsApi.Models;
 
 public enum RolEnum
 {
-    ADMIN,
     MISIONERO,
-    DONANTE
+    DONADOR
 }
 
 public class User
@@ -23,4 +22,7 @@ public class User
     public string Email { get; set; }
     public string Password { get; set; }
     public RolEnum Rol { get; set; }
+
+    public ICollection<Post> Posts { get; set; } = [];
+    public ICollection<Donation> Donations { get; set; } = [];
 }

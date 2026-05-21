@@ -16,33 +16,24 @@ namespace Love4AnimalsApi.Controllers
             this.donationService = donationService;
         }
 
-        /// <summary>
-        /// Obtiene la lista de donaciones registradas en el sistema.
-        /// </summary>
-        /// <returns>Lista de donaciones</returns>
         [HttpGet]
         [EndpointSummary("Obtener donaciones")]
         [Produces("application/json")]
         [ProducesResponseType<List<GetDonationDto>>(StatusCodes.Status200OK)]
-        public IActionResult GetDonations()
+        public async Task<IActionResult> GetDonations()
         {
-            var donations = donationService.GetDonations();
+            var donations = await donationService.GetDonationsAsync();
             return Ok(donations);
         }
 
-        /// <summary>
-        /// Obtiene una donación por su identificador.
-        /// </summary>
-        /// <param name="id">Identificador único de la donación</param>
-        /// <returns>Datos de la donación encontrada</returns>
         [HttpGet("{id}")]
         [EndpointSummary("Obtener donación por ID")]
         [Produces("application/json")]
         [ProducesResponseType<GetDonationDto>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetDonationById(int id)
+        public async Task<IActionResult> GetDonationById(int id)
         {
-            var donation = donationService.GetDonationById(id);
+            var donation = await donationService.GetDonationByIdAsync(id);
 
             if (donation == null)
                 return NotFound(new { message = "Donación no encontrada" });
@@ -50,23 +41,22 @@ namespace Love4AnimalsApi.Controllers
             return Ok(donation);
         }
 
-        /// <summary>
-        /// Registra una nueva donación en el sistema.
-        /// </summary>
-        /// <param name="dto">Datos de la donación a crear</param>
-        /// <returns>Donación creada correctamente</returns>
         [HttpPost]
         [EndpointSummary("Crear donación")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType<GetDonationDto>(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-        public IActionResult CreateDonation([FromBody] CreateDonationDto dto)
+        public async Task<IActionResult> CreateDonation([FromBody] CreateDonationDto dto)
         {
             if (!ModelState.IsValid)
                 return ValidationProblem(ModelState);
 
-            var nueva = donationService.CreateDonation(dto);
+            var nueva = await donationService.CreateDonationAsync(dto);
+
+            if (nueva == null)
+                return NotFound(new { message = "Usuario o campaña no encontrada" });
 
             return CreatedAtAction(
                 nameof(GetDonationById),
@@ -75,48 +65,39 @@ namespace Love4AnimalsApi.Controllers
             );
         }
 
-        /// <summary>
-        /// Actualiza la información de una donación existente.
-        /// </summary>
-        /// <param name="id">Identificador de la donación a actualizar</param>
-        /// <param name="dto">Nuevos datos de la donación</param>
-        /// <returns>Resultado de la actualización</returns>
         [HttpPut("{id}")]
         [EndpointSummary("Actualizar donación")]
         [Consumes("application/json")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [Produces("application/json")]
+        [ProducesResponseType<GetDonationDto>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-        public IActionResult UpdateDonation(int id, [FromBody] UpdateDonationDto dto)
+        public async Task<IActionResult> UpdateDonation(int id, [FromBody] UpdateDonationDto dto)
         {
             if (!ModelState.IsValid)
                 return ValidationProblem(ModelState);
 
-            var updated = donationService.UpdateDonation(id, dto);
+            var updatedDonation = await donationService.UpdateDonationAsync(id, dto);
 
-            if (updated == null)
+            if (updatedDonation == null)
                 return NotFound(new { message = "Donación no encontrada" });
 
-            return Ok(updated);
+            return Ok(updatedDonation);
         }
 
-        /// <summary>
-        /// Elimina una donación del sistema.
-        /// </summary>
-        /// <param name="id">Identificador de la donación a eliminar</param>
-        /// <returns>Resultado de la eliminación</returns>
         [HttpDelete("{id}")]
         [EndpointSummary("Eliminar donación")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [Produces("application/json")]
+        [ProducesResponseType<GetDonationDto>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult DeleteDonation(int id)
+        public async Task<IActionResult> DeleteDonation(int id)
         {
-            var deleted = donationService.DeleteDonation(id);
+            var deletedDonation = await donationService.DeleteDonationAsync(id);
 
-            if (deleted == null)
+            if (deletedDonation == null)
                 return NotFound(new { message = "Donación no encontrada" });
 
-            return Ok(deleted);
+            return Ok(deletedDonation);
         }
     }
 }

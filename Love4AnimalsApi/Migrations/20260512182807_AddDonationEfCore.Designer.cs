@@ -3,6 +3,7 @@ using System;
 using Love4AnimalsApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Love4AnimalsApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260512182807_AddDonationEfCore")]
+    partial class AddDonationEfCore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,9 +89,6 @@ namespace Love4AnimalsApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CampaignId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Estado")
                         .IsRequired()
                         .HasColumnType("text");
@@ -99,14 +99,7 @@ namespace Love4AnimalsApi.Migrations
                     b.Property<double>("Monto")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("CampaignId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Donations");
                 });
@@ -118,9 +111,6 @@ namespace Love4AnimalsApi.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CampaignId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("CantidadComentarios")
                         .HasColumnType("integer");
@@ -156,14 +146,7 @@ namespace Love4AnimalsApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("CampaignId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Posts");
                 });
@@ -199,70 +182,11 @@ namespace Love4AnimalsApi.Migrations
 
             modelBuilder.Entity("Love4AnimalsApi.Models.Comment", b =>
                 {
-                    b.HasOne("Love4AnimalsApi.Models.Post", "Post")
-                        .WithMany("Comments")
+                    b.HasOne("Love4AnimalsApi.Models.Post", null)
+                        .WithMany()
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Post");
-                });
-
-            modelBuilder.Entity("Love4AnimalsApi.Models.Donation", b =>
-                {
-                    b.HasOne("Love4AnimalsApi.Models.Campaign", "Campaign")
-                        .WithMany("Donations")
-                        .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Love4AnimalsApi.Models.User", "User")
-                        .WithMany("Donations")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Campaign");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Love4AnimalsApi.Models.Post", b =>
-                {
-                    b.HasOne("Love4AnimalsApi.Models.Campaign", "Campaign")
-                        .WithMany("Posts")
-                        .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Love4AnimalsApi.Models.User", "User")
-                        .WithMany("Posts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Campaign");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Love4AnimalsApi.Models.Campaign", b =>
-                {
-                    b.Navigation("Donations");
-
-                    b.Navigation("Posts");
-                });
-
-            modelBuilder.Entity("Love4AnimalsApi.Models.Post", b =>
-                {
-                    b.Navigation("Comments");
-                });
-
-            modelBuilder.Entity("Love4AnimalsApi.Models.User", b =>
-                {
-                    b.Navigation("Donations");
-
-                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

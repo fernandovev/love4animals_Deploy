@@ -1,58 +1,48 @@
+using Love4AnimalsApi.Data;
 using Love4AnimalsApi.Interfaces;
 using Love4AnimalsApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Love4AnimalsApi.Repositories;
 
 public class DonationRepository : IDonationRepository
 {
-    private List<Donation> Donations { get; set; }
+    private readonly AppDbContext context;
 
-    public DonationRepository()
+    public DonationRepository(AppDbContext context)
     {
-        Donations = new List<Donation>();
-
-        Donations.Add(new Donation(1, 100, DateTime.Now, EstadoDonacionEnum.CONFIRMADA));
-        Donations.Add(new Donation(2, 50, DateTime.Now, EstadoDonacionEnum.PENDIENTE));
+        this.context = context;
     }
 
-    public List<Donation> GetDonations()
+    public async Task<List<Donation>> GetDonationsAsync()
     {
-        return Donations;
+        return await context.Donations
+            .AsNoTracking()
+            .ToListAsync();
     }
 
-    public Donation? GetDonationById(int id)
+    public async Task<Donation?> GetDonationByIdAsync(int id)
     {
-        return Donations.FirstOrDefault(d => d.Id == id);
+        return await context.Donations
+            .FirstOrDefaultAsync(d => d.Id == id);
     }
 
-    public Donation CreateDonation(Donation donation)
+    public async Task<Donation> CreateDonationAsync(Donation donation)
     {
-        Donations.Add(donation);
+        context.Donations.Add(donation);
+        await context.SaveChangesAsync();
         return donation;
     }
 
-    public bool UpdateDonation(int id, Donation donation)
+    public async Task UpdateDonationAsync(Donation donation)
     {
-        var existingDonation = Donations.FirstOrDefault(d => d.Id == id);
-
-        if (existingDonation == null)
-            return false;
-
-        existingDonation.Monto = donation.Monto;
-        existingDonation.Fecha = donation.Fecha;
-        existingDonation.Estado = donation.Estado;
-
-        return true;
+        context.Donations.Update(donation);
+        await context.SaveChangesAsync();
     }
 
-    public bool DeleteDonation(int id)
+    public async Task DeleteDonationAsync(Donation donation)
     {
-        var donation = Donations.FirstOrDefault(d => d.Id == id);
-
-        if (donation == null)
-            return false;
-
-        Donations.Remove(donation);
-        return true;
+        context.Donations.Remove(donation);
+        await context.SaveChangesAsync();
     }
 }

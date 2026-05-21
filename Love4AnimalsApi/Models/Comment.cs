@@ -11,7 +11,10 @@ public class Comment
     }
 
     public int Id { get; set; }
+
     public int PostId { get; set; }
+    public Post Post { get; set; } = null!;
+
     public string Texto { get; set; }
     public DateTime Fecha { get; set; }
 }

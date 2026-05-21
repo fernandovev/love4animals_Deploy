@@ -51,24 +51,28 @@ namespace Love4AnimalsApi.Controllers
         /// Registra una nueva publicación en el sistema.
         /// </summary>
         [HttpPost]
-        [EndpointSummary("Crear publicación")]
-        [Consumes("application/json")]
-        [Produces("application/json")]
-        [ProducesResponseType<GetPostDto>(StatusCodes.Status201Created)]
-        [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreatePost([FromBody] CreatePostDto dto)
-        {
-            if (!ModelState.IsValid)
-                return ValidationProblem(ModelState);
+[EndpointSummary("Crear publicación")]
+[Consumes("application/json")]
+[Produces("application/json")]
+[ProducesResponseType<GetPostDto>(StatusCodes.Status201Created)]
+[ProducesResponseType(StatusCodes.Status404NotFound)]
+[ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+public async Task<IActionResult> CreatePost([FromBody] CreatePostDto dto)
+{
+    if (!ModelState.IsValid)
+        return ValidationProblem(ModelState);
 
-            var nueva = await postService.CreatePostAsync(dto);
+    var nueva = await postService.CreatePostAsync(dto);
 
-            return CreatedAtAction(
-                nameof(GetPostById),
-                new { id = nueva.Id },
-                nueva
-            );
-        }
+    if (nueva == null)
+        return NotFound(new { message = "Usuario o campaña no encontrada" });
+
+    return CreatedAtAction(
+        nameof(GetPostById),
+        new { id = nueva.Id },
+        nueva
+    );
+}
 
         /// <summary>
         /// Actualiza la información de una publicación existente.

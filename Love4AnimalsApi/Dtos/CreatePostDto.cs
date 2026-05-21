@@ -4,6 +4,12 @@ using Love4AnimalsApi.Models;
 namespace Love4AnimalsApi.Dtos;
 
 public record CreatePostDto(
+    [Range(1, int.MaxValue, ErrorMessage = "El usuario es obligatorio")]
+    int UserId,
+
+    [Range(1, int.MaxValue, ErrorMessage = "La campaña es obligatoria")]
+    int CampaignId,
+
     [Required(ErrorMessage = "El título es obligatorio")]
     [MaxLength(150, ErrorMessage = "El título no puede superar los 150 caracteres")]
     string Titulo,

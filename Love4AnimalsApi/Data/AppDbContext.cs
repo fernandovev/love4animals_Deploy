@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Campaign> Campaigns => Set<Campaign>();
     public DbSet<Post> Posts => Set<Post>();
     public DbSet<Comment> Comments => Set<Comment>();
+    public DbSet<Donation> Donations => Set<Donation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,6 +40,16 @@ public class AppDbContext : DbContext
             entity.Property(p => p.Imagen).IsRequired();
             entity.Property(p => p.Descripcion).IsRequired();
             entity.Property(p => p.Estado).HasConversion<string>();
+
+            entity.HasOne(p => p.User)
+                .WithMany(u => u.Posts)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(p => p.Campaign)
+                .WithMany(c => c.Posts)
+                .HasForeignKey(p => p.CampaignId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Comment>(entity =>
@@ -46,10 +57,28 @@ public class AppDbContext : DbContext
             entity.HasKey(c => c.Id);
             entity.Property(c => c.Texto).IsRequired();
 
-            entity.HasOne<Post>()
-                .WithMany()
+            entity.HasOne(c => c.Post)
+                .WithMany(p => p.Comments)
                 .HasForeignKey(c => c.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Donation>(entity =>
+        {
+            entity.HasKey(d => d.Id);
+            entity.Property(d => d.Monto).IsRequired();
+            entity.Property(d => d.Fecha).IsRequired();
+            entity.Property(d => d.Estado).HasConversion<string>();
+
+            entity.HasOne(d => d.User)
+                .WithMany(u => u.Donations)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(d => d.Campaign)
+                .WithMany(c => c.Donations)
+                .HasForeignKey(d => d.CampaignId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }
