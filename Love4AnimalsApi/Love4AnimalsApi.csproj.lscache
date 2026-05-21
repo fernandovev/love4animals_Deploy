@@ -56,6 +56,7 @@ TemporaryDependencyNodeTargetIdentifier=net10.0
 
 [sourceFiles]
 Controllers/
+ AuthController.cs
  CampaignController.cs
  CommentController.cs
  DonationController.cs
@@ -64,6 +65,7 @@ Controllers/
  WeatherForecastController.cs
 Data/AppDbContext.cs
 Dtos/
+ AuthResponseDto.cs
  CreateCampaignDto.cs
  CreateCommentDto.cs
  CreateDonationDto.cs
@@ -74,12 +76,15 @@ Dtos/
  GetDonationDto.cs
  GetPostDto.cs
  GetUserDto.cs
+ LoginDto.cs
+ RegisterDto.cs
  UpdateCampaignDto.cs
  UpdateCommentDto.cs
  UpdateDonationDto.cs
  UpdatePostDto.cs
  UpdateUserDtop.cs
 Interfaces/
+ IAuthService.cs
  ICampaignRepository.cs
  ICampaignService.cs
  ICommentRepository.cs
@@ -99,6 +104,8 @@ Migrations/
  20260512182807_AddDonationEfCore.Designer.cs
  20260520214526_AddEntityRelations.cs
  20260520214526_AddEntityRelations.Designer.cs
+ 20260521052314_AddPasswordHashAndAuth.cs
+ 20260521052314_AddPasswordHashAndAuth.Designer.cs
  AppDbContextModelSnapshot.cs
 Models/
  Campaign.cs
@@ -118,6 +125,7 @@ Repositories/
  PostRepository.cs
  UserRepository.cs
 Services/
+ AuthService.cs
  CampaignService.cs
  CommentService.cs
  DonationService.cs

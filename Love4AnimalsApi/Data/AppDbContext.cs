@@ -21,7 +21,7 @@ public class AppDbContext : DbContext
             entity.HasKey(u => u.Id);
             entity.Property(u => u.Nombre).IsRequired();
             entity.Property(u => u.Email).IsRequired();
-            entity.Property(u => u.Password).IsRequired();
+            entity.Property(u => u.PasswordHash).IsRequired();
             entity.Property(u => u.Rol).HasConversion<string>();
         });
 

@@ -41,26 +41,6 @@ namespace Love4AnimalsApi.Controllers
             return Ok(user);
         }
 
-        [HttpPost]
-        [EndpointSummary("Crear usuario")]
-        [Consumes("application/json")]
-        [Produces("application/json")]
-        [ProducesResponseType<GetUserDto>(StatusCodes.Status201Created)]
-        [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
-        {
-            if (!ModelState.IsValid)
-                return ValidationProblem(ModelState);
-
-            var nuevo = await userService.CreateUserAsync(dto);
-
-            return CreatedAtAction(
-                nameof(GetUserById),
-                new { id = nuevo.Id },
-                nuevo
-            );
-        }
-
         [HttpPut("{id}")]
         [EndpointSummary("Actualizar usuario")]
         [Consumes("application/json")]

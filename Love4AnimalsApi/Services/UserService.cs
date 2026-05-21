@@ -1,6 +1,5 @@
 using Love4AnimalsApi.Dtos;
 using Love4AnimalsApi.Interfaces;
-using Love4AnimalsApi.Models;
 
 namespace Love4AnimalsApi.Services;
 
@@ -21,7 +20,6 @@ public class UserService : IUserService
             user.Id,
             user.Nombre,
             user.Email,
-            user.Password,
             user.Rol
         )).ToList();
     }
@@ -37,29 +35,7 @@ public class UserService : IUserService
             user.Id,
             user.Nombre,
             user.Email,
-            user.Password,
             user.Rol
-        );
-    }
-
-    public async Task<GetUserDto> CreateUserAsync(CreateUserDto dto)
-    {
-        User newUser = new User(
-            0,
-            dto.Nombre,
-            dto.Email,
-            dto.Password,
-            dto.Rol
-        );
-
-        var createdUser = await userRepository.CreateUserAsync(newUser);
-
-        return new GetUserDto(
-            createdUser.Id,
-            createdUser.Nombre,
-            createdUser.Email,
-            createdUser.Password,
-            createdUser.Rol
         );
     }
 
@@ -72,8 +48,12 @@ public class UserService : IUserService
 
         user.Nombre = dto.Nombre;
         user.Email = dto.Email;
-        user.Password = dto.Password;
         user.Rol = dto.Rol;
+
+        if (!string.IsNullOrWhiteSpace(dto.Password))
+        {
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password, workFactor: 12);
+        }
 
         await userRepository.UpdateUserAsync(user);
 
@@ -81,7 +61,6 @@ public class UserService : IUserService
             user.Id,
             user.Nombre,
             user.Email,
-            user.Password,
             user.Rol
         );
     }
@@ -97,7 +76,6 @@ public class UserService : IUserService
             user.Id,
             user.Nombre,
             user.Email,
-            user.Password,
             user.Rol
         );
 

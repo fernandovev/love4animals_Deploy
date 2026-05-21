@@ -2,9 +2,10 @@ using Love4AnimalsApi.Models;
 
 namespace Love4AnimalsApi.Dtos;
 
-public record GetUserDto(
+public record AuthResponseDto(
     int Id,
     string Nombre,
     string Email,
-    RolEnum Rol
+    RolEnum Rol,
+    string Message
 );
