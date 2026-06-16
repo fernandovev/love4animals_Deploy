@@ -23,6 +23,7 @@ public class User
     public string PasswordHash { get; set; }
     public RolEnum Rol { get; set; }
 
+    public ICollection<Campaign> Campaigns { get; set; } = [];
     public ICollection<Post> Posts { get; set; } = [];
     public ICollection<Donation> Donations { get; set; } = [];
 }

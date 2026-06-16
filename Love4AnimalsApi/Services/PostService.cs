@@ -1,6 +1,8 @@
+using System.Text.Json;
 using Love4AnimalsApi.Dtos;
 using Love4AnimalsApi.Interfaces;
 using Love4AnimalsApi.Models;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Love4AnimalsApi.Services;
 
@@ -9,22 +11,31 @@ public class PostService : IPostService
     private readonly IPostRepository postRepository;
     private readonly IUserRepository userRepository;
     private readonly ICampaignRepository campaignRepository;
+    private readonly IDistributedCache cache;
+    private const string PostsCacheKey = "posts:list";
 
     public PostService(
         IPostRepository postRepository,
         IUserRepository userRepository,
-        ICampaignRepository campaignRepository)
+        ICampaignRepository campaignRepository,
+        IDistributedCache cache)
     {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.campaignRepository = campaignRepository;
+        this.cache = cache;
     }
 
     public async Task<List<GetPostDto>> GetPostsAsync()
     {
+        var cached = await cache.GetStringAsync(PostsCacheKey);
+
+        if (cached != null)
+            return JsonSerializer.Deserialize<List<GetPostDto>>(cached)!;
+
         var posts = await postRepository.GetPostsAsync();
 
-        return posts.Select(p => new GetPostDto(
+        var result = posts.Select(p => new GetPostDto(
             p.Id,
             p.UserId,
             p.CampaignId,
@@ -39,6 +50,16 @@ public class PostService : IPostService
             p.CantidadComentarios,
             p.CantidadCompartidos
         )).ToList();
+
+        await cache.SetStringAsync(
+            PostsCacheKey,
+            JsonSerializer.Serialize(result),
+            new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+            });
+
+        return result;
     }
 
     public async Task<GetPostDto?> GetPostByIdAsync(int id)
@@ -93,6 +114,8 @@ public class PostService : IPostService
 
         var createdPost = await postRepository.CreatePostAsync(newPost);
 
+        await cache.RemoveAsync(PostsCacheKey);
+
         return new GetPostDto(
             createdPost.Id,
             createdPost.UserId,
@@ -136,6 +159,8 @@ public class PostService : IPostService
 
         await postRepository.UpdatePostAsync(post);
 
+        await cache.RemoveAsync(PostsCacheKey);
+
         return new GetPostDto(
             post.Id,
             post.UserId,
@@ -177,6 +202,8 @@ public class PostService : IPostService
         );
 
         await postRepository.DeletePostAsync(post);
+
+        await cache.RemoveAsync(PostsCacheKey);
 
         return deletedPost;
     }

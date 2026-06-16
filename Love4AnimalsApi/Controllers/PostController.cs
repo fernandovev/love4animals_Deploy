@@ -1,12 +1,14 @@
 using Love4AnimalsApi.Dtos;
 using Love4AnimalsApi.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Love4AnimalsApi.Controllers
 {
     [ApiController]
     [Route("v1/posts")]
     [Tags("Publicaciones")]
+    [Authorize]
     public class PostController : ControllerBase
     {
         private readonly IPostService postService;

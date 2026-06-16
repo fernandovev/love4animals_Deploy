@@ -1,12 +1,14 @@
 using Love4AnimalsApi.Dtos;
 using Love4AnimalsApi.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Love4AnimalsApi.Controllers
 {
     [ApiController]
     [Route("v1/donations")]
     [Tags("Donaciones")]
+    [Authorize]
     public class DonationController : ControllerBase
     {
         private readonly IDonationService donationService;
@@ -41,6 +43,7 @@ namespace Love4AnimalsApi.Controllers
             return Ok(donation);
         }
 
+        [Authorize(Roles = "DONADOR")]
         [HttpPost]
         [EndpointSummary("Crear donación")]
         [Consumes("application/json")]

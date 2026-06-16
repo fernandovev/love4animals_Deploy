@@ -28,9 +28,15 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Campaign>(entity =>
         {
             entity.HasKey(c => c.Id);
+
             entity.Property(c => c.Titulo).IsRequired();
             entity.Property(c => c.Estado).HasConversion<string>();
             entity.Property(c => c.Descripcion).IsRequired();
+
+            entity.HasOne(c => c.User)
+                .WithMany(u => u.Campaigns)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Post>(entity =>

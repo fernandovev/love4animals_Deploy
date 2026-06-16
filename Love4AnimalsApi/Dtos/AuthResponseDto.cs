@@ -7,5 +7,7 @@ public record AuthResponseDto(
     string Nombre,
     string Email,
     RolEnum Rol,
+    string Token,
+    string RefreshToken,
     string Message
 );

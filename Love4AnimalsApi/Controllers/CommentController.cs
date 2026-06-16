@@ -1,12 +1,14 @@
 using Love4AnimalsApi.Dtos;
 using Love4AnimalsApi.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Love4AnimalsApi.Controllers
 {
     [ApiController]
     [Route("v1/posts/{postId}/comments")]
     [Tags("Comentarios")]
+    [Authorize]
     public class CommentController : ControllerBase
     {
         private readonly ICommentService commentService;

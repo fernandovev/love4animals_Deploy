@@ -9,9 +9,17 @@ public enum EstadoCampaniaEnum
 
 public class Campaign
 {
-    public Campaign(int id, string titulo, double metaRecaudacion, double montoActual, EstadoCampaniaEnum estado, string descripcion)
+    public Campaign(
+        int id,
+        int userId,
+        string titulo,
+        double metaRecaudacion,
+        double montoActual,
+        EstadoCampaniaEnum estado,
+        string descripcion)
     {
         Id = id;
+        UserId = userId;
         Titulo = titulo;
         MetaRecaudacion = metaRecaudacion;
         MontoActual = montoActual;
@@ -20,6 +28,10 @@ public class Campaign
     }
 
     public int Id { get; set; }
+
+    public int UserId { get; set; }
+    public User User { get; set; } = null!;
+
     public string Titulo { get; set; }
     public double MetaRecaudacion { get; set; }
     public double MontoActual { get; set; }

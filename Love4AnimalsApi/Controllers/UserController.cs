@@ -1,12 +1,14 @@
 using Love4AnimalsApi.Dtos;
 using Love4AnimalsApi.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Love4AnimalsApi.Controllers
 {
     [ApiController]
     [Route("v1/users")]
     [Tags("Usuarios")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService userService;
