@@ -28,10 +28,17 @@ public class PostService : IPostService
 
     public async Task<List<GetPostDto>> GetPostsAsync()
     {
-        var cached = await cache.GetStringAsync(PostsCacheKey);
+        try
+        {
+            var cached = await cache.GetStringAsync(PostsCacheKey);
 
-        if (cached != null)
-            return JsonSerializer.Deserialize<List<GetPostDto>>(cached)!;
+            if (cached != null)
+                return JsonSerializer.Deserialize<List<GetPostDto>>(cached)!;
+        }
+        catch
+        {
+            // Si Redis falla, se continúa con PostgreSQL.
+        }
 
         var posts = await postRepository.GetPostsAsync();
 
@@ -51,13 +58,20 @@ public class PostService : IPostService
             p.CantidadCompartidos
         )).ToList();
 
-        await cache.SetStringAsync(
-            PostsCacheKey,
-            JsonSerializer.Serialize(result),
-            new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
-            });
+        try
+        {
+            await cache.SetStringAsync(
+                PostsCacheKey,
+                JsonSerializer.Serialize(result),
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+                });
+        }
+        catch
+        {
+            // Si Redis falla, igual se devuelve la respuesta.
+        }
 
         return result;
     }
@@ -114,7 +128,14 @@ public class PostService : IPostService
 
         var createdPost = await postRepository.CreatePostAsync(newPost);
 
-        await cache.RemoveAsync(PostsCacheKey);
+        try
+        {
+            await cache.RemoveAsync(PostsCacheKey);
+        }
+        catch
+        {
+            // Si Redis falla, no se interrumpe la creación.
+        }
 
         return new GetPostDto(
             createdPost.Id,
@@ -159,7 +180,14 @@ public class PostService : IPostService
 
         await postRepository.UpdatePostAsync(post);
 
-        await cache.RemoveAsync(PostsCacheKey);
+        try
+        {
+            await cache.RemoveAsync(PostsCacheKey);
+        }
+        catch
+        {
+            // Si Redis falla, no se interrumpe la actualización.
+        }
 
         return new GetPostDto(
             post.Id,
@@ -203,7 +231,14 @@ public class PostService : IPostService
 
         await postRepository.DeletePostAsync(post);
 
-        await cache.RemoveAsync(PostsCacheKey);
+        try
+        {
+            await cache.RemoveAsync(PostsCacheKey);
+        }
+        catch
+        {
+            // Si Redis falla, no se interrumpe la eliminación.
+        }
 
         return deletedPost;
     }

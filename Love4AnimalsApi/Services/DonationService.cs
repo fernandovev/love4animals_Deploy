@@ -4,7 +4,6 @@ using Love4AnimalsApi.Interfaces;
 using Love4AnimalsApi.Models;
 using Microsoft.Extensions.Caching.Distributed;
 
-
 namespace Love4AnimalsApi.Services;
 
 public class DonationService : IDonationService
@@ -29,10 +28,17 @@ public class DonationService : IDonationService
 
     public async Task<List<GetDonationDto>> GetDonationsAsync()
     {
-        var cached = await cache.GetStringAsync(DonationsCacheKey);
+        try
+        {
+            var cached = await cache.GetStringAsync(DonationsCacheKey);
 
-        if (cached != null)
-            return JsonSerializer.Deserialize<List<GetDonationDto>>(cached)!;
+            if (cached != null)
+                return JsonSerializer.Deserialize<List<GetDonationDto>>(cached)!;
+        }
+        catch
+        {
+            // Si Redis falla, se continúa con PostgreSQL.
+        }
 
         var donations = await donationRepository.GetDonationsAsync();
 
@@ -45,13 +51,20 @@ public class DonationService : IDonationService
             d.Estado
         )).ToList();
 
-        await cache.SetStringAsync(
-            DonationsCacheKey,
-            JsonSerializer.Serialize(result),
-            new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
-            });
+        try
+        {
+            await cache.SetStringAsync(
+                DonationsCacheKey,
+                JsonSerializer.Serialize(result),
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+                });
+        }
+        catch
+        {
+            // Si Redis falla, igual se devuelve la respuesta.
+        }
 
         return result;
     }
@@ -94,7 +107,14 @@ public class DonationService : IDonationService
 
         var createdDonation = await donationRepository.CreateDonationAsync(newDonation);
 
-        await cache.RemoveAsync(DonationsCacheKey);
+        try
+        {
+            await cache.RemoveAsync(DonationsCacheKey);
+        }
+        catch
+        {
+            // Si Redis falla, no se interrumpe la creación.
+        }
 
         return new GetDonationDto(
             createdDonation.Id,
@@ -129,7 +149,14 @@ public class DonationService : IDonationService
 
         await donationRepository.UpdateDonationAsync(donation);
 
-        await cache.RemoveAsync(DonationsCacheKey);
+        try
+        {
+            await cache.RemoveAsync(DonationsCacheKey);
+        }
+        catch
+        {
+            // Si Redis falla, no se interrumpe la actualización.
+        }
 
         return new GetDonationDto(
             donation.Id,
@@ -159,7 +186,14 @@ public class DonationService : IDonationService
 
         await donationRepository.DeleteDonationAsync(donation);
 
-        await cache.RemoveAsync(DonationsCacheKey);
+        try
+        {
+            await cache.RemoveAsync(DonationsCacheKey);
+        }
+        catch
+        {
+            // Si Redis falla, no se interrumpe la eliminación.
+        }
 
         return deletedDonation;
     }

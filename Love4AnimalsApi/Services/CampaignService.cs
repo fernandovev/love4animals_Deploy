@@ -25,10 +25,17 @@ public class CampaignService : ICampaignService
 
     public async Task<List<GetCampaignDto>> GetCampaignsAsync()
     {
-        var cached = await cache.GetStringAsync(CampaignsCacheKey);
+        try
+        {
+            var cached = await cache.GetStringAsync(CampaignsCacheKey);
 
-        if (cached != null)
-            return JsonSerializer.Deserialize<List<GetCampaignDto>>(cached)!;
+            if (cached != null)
+                return JsonSerializer.Deserialize<List<GetCampaignDto>>(cached)!;
+        }
+        catch
+        {
+            // Si Redis falla, se continúa con PostgreSQL.
+        }
 
         var campaigns = await campaignRepository.GetCampaignsAsync();
 
@@ -42,13 +49,20 @@ public class CampaignService : ICampaignService
             c.Descripcion
         )).ToList();
 
-        await cache.SetStringAsync(
-            CampaignsCacheKey,
-            JsonSerializer.Serialize(result),
-            new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
-            });
+        try
+        {
+            await cache.SetStringAsync(
+                CampaignsCacheKey,
+                JsonSerializer.Serialize(result),
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+                });
+        }
+        catch
+        {
+            // Si Redis falla, igual se devuelve la respuesta.
+        }
 
         return result;
     }
@@ -90,7 +104,14 @@ public class CampaignService : ICampaignService
 
         var createdCampaign = await campaignRepository.CreateCampaignAsync(newCampaign);
 
-        await cache.RemoveAsync(CampaignsCacheKey);
+        try
+        {
+            await cache.RemoveAsync(CampaignsCacheKey);
+        }
+        catch
+        {
+            
+        }
 
         return new GetCampaignDto(
             createdCampaign.Id,
@@ -124,7 +145,14 @@ public class CampaignService : ICampaignService
 
         await campaignRepository.UpdateCampaignAsync(campaign);
 
-        await cache.RemoveAsync(CampaignsCacheKey);
+        try
+        {
+            await cache.RemoveAsync(CampaignsCacheKey);
+        }
+        catch
+        {
+            
+        }
 
         return new GetCampaignDto(
             campaign.Id,
@@ -156,7 +184,14 @@ public class CampaignService : ICampaignService
 
         await campaignRepository.DeleteCampaignAsync(campaign);
 
-        await cache.RemoveAsync(CampaignsCacheKey);
+        try
+        {
+            await cache.RemoveAsync(CampaignsCacheKey);
+        }
+        catch
+        {
+            
+        }
 
         return deletedCampaign;
     }
